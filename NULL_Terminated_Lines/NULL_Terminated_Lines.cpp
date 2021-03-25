@@ -27,6 +27,8 @@ bool is_int_number(char str[]);
 int  to_int_numer(char str[]);
 int  bin_to_dec(char str[]);
 int  hex_to_dec(char str[]);
+bool is_mac_address(char str[]);	//Проверяет, является ли строка MAC-адресом
+bool is_ip_address(char str[]);		//Проверяет, является ли строка IP-адресом
 
 int main()
 {
@@ -60,6 +62,8 @@ int main()
 		cout << "Значение шестнадцатеричного числа в десятичной системе счисления: " << number_10 << endl;
 	}
 	else cout << "Строка - не число!" << endl;
+	if (is_mac_address(str)==true) cout << "Строка " <<str<<" является MAC-адресом " <<endl;
+	if (is_ip_address(str) == true) cout << "Строка " << str << " является IP-адресом" << endl;
 	
 	
 }
@@ -211,6 +215,7 @@ int to_int_numer(char str[])
 		if (str_num[i] > 9)
 		{
 			cout << "Число не является десятичным! " << endl;
+			delete[] str_num;
 			return (-1); //код ошибки
 		}
 
@@ -236,6 +241,7 @@ int bin_to_dec(char str[])
 		if (str_num[i]>1)
 		{
 			cout << "Число не является двоичным! " << endl;
+			delete[] str_num;
 			return (-1); //код ошибки
 		}
 				      
@@ -267,4 +273,138 @@ int hex_to_dec(char str[])
 	delete[] str_num;
 
 	return number;
+}
+
+bool is_mac_address(char str[])
+{
+	int num = StrLen(str);
+	bool flag = true;
+	for (int i = 0; i < num; i++) 
+	{
+		if (str[i] == ' ') 
+		{
+			for (int j = i; j < num; j++) str[j] = str[j + 1];
+			i--;
+		}
+
+	}
+	num = StrLen(str);
+	if (num == 17)
+	{
+		for (int i = 0; i < num; i++)
+		{
+
+			if ((i + 1) % 3 != 0)
+			{
+				if (((str[i] < 48) || (str[i] > 58)) && ((str[i] < 65) || (str[i] > 70)) && ((str[i] < 97) || (str[i] > 102))) flag = false;
+			}
+			else if ((i + 1) % 3 == 0)
+			{
+				if (str[i] != '-') flag = false;
+			}
+
+		}
+	}
+	else flag = false;
+
+	return flag;
+	
+	
+	
+}
+
+bool is_ip_address(char str[])
+{
+	int num = StrLen(str);
+	int number = 0;
+	int counter_1 = 0;//Сдвиг
+	int counter_2 = 0;//Число разрядов
+	int counter_3 = 0;//Число точек
+	
+	int t;
+	bool flag = true;
+	bool Numb = false;
+	for (int i = 0; i < num; i++)
+	{
+		if (str[i] == ' ')
+		{
+			for (int j = i; j < num; j++) str[j] = str[j + 1];
+			i--;
+		}
+
+	}
+	num = StrLen(str);
+	for (int i = 0; i < num; i++)
+	{
+		if (((str[i] < 48) || (str[i] > 58)) && (str[i] != '.'))
+		{
+			    flag = false;
+				return flag;
+		}
+	}
+	for (int i = 0; i < num; i++)
+	{
+		if ((str[i] >= 48) && (str[i] <= 58))
+		{
+			counter_2++;
+			Numb = true;
+		}
+		
+			
+		if (str[i] == '.')
+		{
+			counter_3++;
+
+			for (int j = counter_1; j < counter_2+counter_1; j++)
+			{
+				t = str[j] - 48;
+				number += t * pow(10, counter_2 - 1 - j + counter_1);
+				
+				
+			}
+			if (number > 255)
+			{
+				flag = false;
+				return flag;
+			}
+			if (number<=255)
+			{
+				number = 0;
+				counter_1 += counter_2+1; 
+				counter_2 = 0;
+				Numb = false;
+				
+			}
+		}
+		
+		
+	}
+
+	
+	
+	if ((counter_3 != 3) || (Numb == false)) { flag = false; }
+	else
+	{
+		
+		for (int j = counter_1; j < counter_2 + counter_1; j++)
+		{
+			
+				t = str[j] - 48;
+				number += t * pow(10, counter_2 - 1 - j + counter_1);
+			
+
+
+			
+		}
+		if (number > 255)
+		{
+			flag = false;
+			return flag;
+		}
+	}
+	
+	
+	
+
+	return flag;
 }
